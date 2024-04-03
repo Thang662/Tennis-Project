@@ -11,7 +11,7 @@ class BallDetector:
         self.model = TrackNetV2(n_channels = 9, n_classes = 3)
         self.device = device
         if path_model:
-            self.model.load_state_dict(torch.load(path_model, map_location=device))
+            self.model.load_state_dict(torch.load(path_model, map_location=device)['model_state_dict'])
             self.model = self.model.to(device)
             self.model.eval()
         self.width = 640
@@ -41,7 +41,7 @@ class BallDetector:
                 ball_track.append((x_pred, y_pred))
         return ball_track
 
-    def postprocess(self, feature_map, prev_pred, scale=2, max_dist=80):
+    def postprocess(self, feature_map, prev_pred, scale=1080/288, max_dist=80):
         """
         :params
             feature_map: feature map with shape (1,360,640)
@@ -55,6 +55,7 @@ class BallDetector:
         # feature_map = feature_map.reshape((self.height, self.width))
         # feature_map = feature_map.astype(np.uint8)
         ret, heatmap = cv2.threshold(feature_map, 0.5, 1, cv2.THRESH_BINARY)
+        heatmap = heatmap.astype(np.uint8)
         circles = cv2.HoughCircles(heatmap, cv2.HOUGH_GRADIENT, dp=1, minDist=1, param1=50, param2=2, minRadius=2,
                                    maxRadius=7)
         x, y = None, None
