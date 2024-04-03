@@ -72,7 +72,7 @@ class BallDetector:
                 y = circles[0][0][1]*scale
         return x, y
     
-    def _detect_blob_concomp(hm, _score_threshold = 0.5, _use_hm_weight = False):
+    def _detect_blob_concomp(self, hm, _score_threshold = 0.5, _use_hm_weight = False):
         x, y = None, None
         if np.max(hm) > _score_threshold:
             best_score = -1
