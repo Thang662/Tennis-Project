@@ -19,7 +19,7 @@ class CourtDetectorNet():
     def infer_model(self, frames):
         output_width = 640
         output_height = 360
-        scale = 2
+        scale = 3
         
         kps_res = []
         matrixes_res = []
