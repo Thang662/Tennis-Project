@@ -8,6 +8,8 @@ from ball_detector import BallDetector
 from utils import scene_detect
 import argparse
 import torch
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
 def read_video(path_video):
     cap = cv2.VideoCapture(path_video)
@@ -145,7 +147,14 @@ if __name__ == '__main__':
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     frames, fps = read_video(args.path_input_video) 
-    scenes = scene_detect(args.path_input_video)    
+    scenes = scene_detect(args.path_input_video)
+    transform = A.Compose([
+                        A.Resize(height = 288, width = 512, p = 1),
+                        A.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225], max_pixel_value = 255.0, p = 1.0),
+                        ToTensorV2()
+                    ],
+                )
+    frames = [transform(image = frame)['image'] for frame in frames]
 
     print('ball detection')
     ball_detector = BallDetector(args.path_ball_track_model, device)

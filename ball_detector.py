@@ -4,10 +4,11 @@ import cv2
 import numpy as np
 from scipy.spatial import distance
 from tqdm import tqdm
+from unet2d import TrackNetV2
 
 class BallDetector:
     def __init__(self, path_model=None, device='cuda'):
-        self.model = BallTrackerNet(input_channels=9, out_channels=256)
+        self.model = TrackNetV2(n_channels = 9, n_classes = 3)
         self.device = device
         if path_model:
             self.model.load_state_dict(torch.load(path_model, map_location=device))
@@ -25,20 +26,19 @@ class BallDetector:
         """
         ball_track = [(None, None)]*2
         prev_pred = [None, None]
-        for num in tqdm(range(2, len(frames))):
-            img = cv2.resize(frames[num], (self.width, self.height))
-            img_prev = cv2.resize(frames[num-1], (self.width, self.height))
-            img_preprev = cv2.resize(frames[num-2], (self.width, self.height))
-            imgs = np.concatenate((img, img_prev, img_preprev), axis=2)
-            imgs = imgs.astype(np.float32)/255.0
-            imgs = np.rollaxis(imgs, 2, 0)
-            inp = np.expand_dims(imgs, axis=0)
+        for num in tqdm(range(2, len(frames), 3)):
+            img = frames[num]
+            img_prev = frames[num-1]
+            img_preprev = frames[num-2]
+            imgs = torch.cat((img_preprev, img_prev, img))
+            inp = torch.unsqueeze(imgs, 0)
 
-            out = self.model(torch.from_numpy(inp).float().to(self.device))
-            output = out.argmax(dim=1).detach().cpu().numpy()
-            x_pred, y_pred = self.postprocess(output, prev_pred)
-            prev_pred = [x_pred, y_pred]
-            ball_track.append((x_pred, y_pred))
+            out = self.model(inp.float().to(self.device))
+            output = torch.sigmoid(out).detach().cpu().numpy()
+            for i in range(3):
+                x_pred, y_pred = self.postprocess(output[0][i], prev_pred)
+                prev_pred = [x_pred, y_pred]
+                ball_track.append((x_pred, y_pred))
         return ball_track
 
     def postprocess(self, feature_map, prev_pred, scale=2, max_dist=80):
@@ -51,10 +51,10 @@ class BallDetector:
         :return
             x,y ball coordinates
         """
-        feature_map *= 255
-        feature_map = feature_map.reshape((self.height, self.width))
-        feature_map = feature_map.astype(np.uint8)
-        ret, heatmap = cv2.threshold(feature_map, 127, 255, cv2.THRESH_BINARY)
+        # feature_map *= 255
+        # feature_map = feature_map.reshape((self.height, self.width))
+        # feature_map = feature_map.astype(np.uint8)
+        ret, heatmap = cv2.threshold(feature_map, 0.5, 1, cv2.THRESH_BINARY)
         circles = cv2.HoughCircles(heatmap, cv2.HOUGH_GRADIENT, dp=1, minDist=1, param1=50, param2=2, minRadius=2,
                                    maxRadius=7)
         x, y = None, None
