@@ -36,8 +36,7 @@ class BallDetector:
             out = self.model(inp.float().to(self.device))
             output = torch.sigmoid(out).detach().cpu().numpy()
             for i in range(3):
-                x_pred, y_pred = self.postprocess(output[0][i], prev_pred)
-                prev_pred = [x_pred, y_pred]
+                x_pred, y_pred = self._detect_blob_concomp(output[0][i])
                 ball_track.append((x_pred, y_pred))
         return ball_track
 
@@ -71,4 +70,29 @@ class BallDetector:
             else:
                 x = circles[0][0][0]*scale
                 y = circles[0][0][1]*scale
+        return x, y
+    
+    def _detect_blob_concomp(hm, _score_threshold = 0.5, _use_hm_weight = False):
+        x, y = None, None
+        if np.max(hm) > _score_threshold:
+            best_score = -1
+            visi = True
+            th, hm_th        = cv2.threshold(hm, _score_threshold, 1, cv2.THRESH_BINARY)
+            n_labels, labels = cv2.connectedComponents(hm_th.astype(np.uint8))
+            for m in range(1, n_labels):
+                ys, xs = np.where(labels == m)
+                ws     = hm[ys, xs]
+                if _use_hm_weight:
+                    score  = ws.sum()
+                    x_temp      = np.sum( np.array(xs) * ws ) / np.sum(ws)
+                    y_temp      = np.sum( np.array(ys) * ws ) / np.sum(ws)
+                else:
+                    score  = ws.shape[0]
+                    x_temp      = np.sum( np.array(xs) ) / ws.shape[0]
+                    y_temp      = np.sum( np.array(ys) ) / ws.shape[0]
+                    #print(xs, ys)
+                    #print(score, x, y)
+                if score > best_score:
+                    best_score = score
+                    x, y = x_temp, y_temp
         return x, y
