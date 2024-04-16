@@ -24,8 +24,7 @@ class BallDetector:
         :return
             ball_track: list of detected ball points
         """
-        ball_track = [(None, None)]*2
-        prev_pred = [None, None]
+        ball_track = []
         scale = frames[0].shape[0] / self.height
         for num in tqdm(range(2, len(frames), 3)):
             img = frames[num]
