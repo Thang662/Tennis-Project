@@ -34,8 +34,9 @@ class BallDetector:
             imgs = torch.cat((img_preprev, img_prev, img))
             inp = torch.unsqueeze(imgs, 0)
 
-            out = self.model(inp.float().to(self.device))
+            out = self.model(inp)
             output = torch.sigmoid(out).detach().cpu().numpy()
+
             for i in range(3):
                 x_pred, y_pred = self._detect_blob_concomp(output[0][i])
                 ball_track.append((x_pred, y_pred))
