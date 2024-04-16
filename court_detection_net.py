@@ -36,8 +36,9 @@ class CourtDetectorNet():
             out = self.model(inp.to(self.device))
             pred = F.sigmoid(out).detach().cpu().numpy()
 
-            points = []
+            
             for i in range(3):
+                points = []
                 for kps_num in range(14):
                     x_pred, y_pred = self._detect_blob_concomp(pred[0][i * 15 + kps_num])
                     if x_pred is not None:
