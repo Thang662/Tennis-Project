@@ -50,7 +50,6 @@ class CourtDetectorNet():
                     matrix_trans = cv2.invert(matrix_trans)[1]
                 kps_res.append(points)
                 matrixes_res.append(matrix_trans)
-        print(num)
         return matrixes_res, kps_res    
 
     def _detect_blob_concomp(self, hm, _score_threshold = 0.5, _use_hm_weight = False, scale = 1080/288):
