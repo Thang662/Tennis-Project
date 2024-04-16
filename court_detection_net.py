@@ -42,8 +42,8 @@ class CourtDetectorNet():
                 for kps_num in range(14):
                     x_pred, y_pred = self._detect_blob_concomp(pred[0][i * 15 + kps_num])
                     if x_pred is not None:
-                        if kps_num not in [8, 12, 9]:
-                            x_pred, y_pred = refine_kps(image_list[i], int(y_pred), int(x_pred), crop_size=40)
+                        # if kps_num not in [8, 12, 9]:
+                        #     x_pred, y_pred = refine_kps(image_list[i], int(y_pred), int(x_pred), crop_size=40)
                         points.append((x_pred, y_pred))                
                     else:
                         points.append(None)
