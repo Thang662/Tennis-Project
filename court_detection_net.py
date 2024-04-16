@@ -33,7 +33,7 @@ class CourtDetectorNet():
             inp = torch.tensor(np.rollaxis(inp, 2, 0))
             inp = inp.unsqueeze(0)
 
-            out = self.model(inp)
+            out = self.model(inp.to(self.device))
             pred = F.sigmoid(out).detach().cpu().numpy()
 
             points = []

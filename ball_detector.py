@@ -10,7 +10,7 @@ class BallDetector:
     def __init__(self, path_model=None, device='cuda'):
         self.device = device
         if path_model:
-            self.model = LitTrackNetV2.load_from_checkpoint(path_model)
+            self.model = LitTrackNetV2.load_from_checkpoint(path_model, frame_in = 9, frame_out = 3)
             # self.model.load_state_dict(torch.load(path_model, map_location=device)['state_dict'], strict = True)
             # self.model = self.model.to(device)
             self.model.eval()
@@ -34,9 +34,9 @@ class BallDetector:
             imgs = torch.cat((img_preprev, img_prev, img))
             inp = torch.unsqueeze(imgs, 0)
 
-            out = self.model(inp)
+            out = self.model(inp.to(self.device))
             output = torch.sigmoid(out).detach().cpu().numpy()
-
+            
             for i in range(3):
                 x_pred, y_pred = self._detect_blob_concomp(output[0][i])
                 ball_track.append((x_pred, y_pred))
