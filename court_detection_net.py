@@ -47,13 +47,13 @@ class CourtDetectorNet():
                     else:
                         points.append(None)
 
-            matrix_trans = get_trans_matrix(points) 
-            points = None
-            if matrix_trans is not None:
-                points = cv2.perspectiveTransform(refer_kps, matrix_trans)
-                matrix_trans = cv2.invert(matrix_trans)[1]
-            kps_res.append(points)
-            matrixes_res.append(matrix_trans)
+                matrix_trans = get_trans_matrix(points) 
+                points = None
+                if matrix_trans is not None:
+                    points = cv2.perspectiveTransform(refer_kps, matrix_trans)
+                    matrix_trans = cv2.invert(matrix_trans)[1]
+                kps_res.append(points)
+                matrixes_res.append(matrix_trans)
             
         return matrixes_res, kps_res    
 
