@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     print('ball detection')
     ball_detector = BallDetector(args.path_ball_track_model, device)
-    ball_track = ball_detector.infer_model(frames_tmp)
+    ball_track = ball_detector.infer_model(frames_tmp, frames)
 
     print('court detection')
     court_detector = CourtDetectorNet(args.path_court_model, device)

@@ -14,24 +14,24 @@ class CourtDetectorNet():
             self.model = LitTrackNetV2.load_from_checkpoint(path_model, frame_in = 9, frame_out = 45)
             self.model.eval()
             
-    def infer_model(self, frames):
+    def infer_model(self, frames, images):
         output_width = 640
         output_height = 360
         scale = 3
         
         kps_res = []
         matrixes_res = []
-        for num_frame, image in enumerate(tqdm(frames)):
+        for num in tqdm(range(2, len(frames), 3)):
             # img = frames[num]
-            # img_prev = frames[num-1]
-            # img_preprev = frames[num-2]
-            # imgs = torch.cat((img_preprev, img_prev, img))
-            # inp = torch.unsqueeze(imgs, 0)
+            img_prev = frames[num-1]
+            img_preprev = frames[num-2]
+            imgs = torch.cat((img_preprev, img_prev, img))
+            inp = torch.unsqueeze(imgs, 0)
 
-            img = cv2.resize(image, (output_width, output_height))
-            inp = (img.astype(np.float32) / 255.)
-            inp = torch.tensor(np.rollaxis(inp, 2, 0))
-            inp = inp.unsqueeze(0)
+            image = images[num]
+            image_prev = images[num-1]
+            image_preprev = images[num-2]
+            image_list = np.concatenate((image_preprev, image_prev, image), axis=2)
 
             out = self.model(inp.to(self.device))
             pred = F.sigmoid(out).detach().cpu().numpy()
@@ -42,7 +42,7 @@ class CourtDetectorNet():
                     x_pred, y_pred = self._detect_blob_concomp(pred[0][i * 15 + kps_num])
                     if x_pred is not None:
                         if kps_num not in [8, 12, 9]:
-                            x_pred, y_pred = refine_kps(image, int(y_pred), int(x_pred), crop_size=40)
+                            x_pred, y_pred = refine_kps(image_list[i], int(y_pred), int(x_pred), crop_size=40)
                         points.append((x_pred, y_pred))                
                     else:
                         points.append(None)
