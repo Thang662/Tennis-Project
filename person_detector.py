@@ -6,12 +6,16 @@ from scipy import signal
 import numpy as np
 from scipy.spatial import distance
 from tqdm import tqdm
+from ultralytics import YOLO
 
 class PersonDetector():
     def __init__(self, dtype=torch.FloatTensor):
-        self.detection_model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+        # self.detection_model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+        self.detection_model = YOLO("yolov8n.pt")
+        self.detection_model.export(format='engine')
+        self.detection_model = YOLO("yolov8n.engine")
         self.detection_model = self.detection_model.to(dtype)
-        self.detection_model.eval()
+        # self.detection_model.eval()
         self.dtype = dtype
         self.court_ref = CourtReference()
         self.ref_top_court = self.court_ref.get_court_mask(2)
@@ -23,16 +27,17 @@ class PersonDetector():
 
         
     def detect(self, image, person_min_score=0.85): 
-        PERSON_LABEL = 1
-        frame_tensor = image.transpose((2, 0, 1)) / 255
-        frame_tensor = torch.from_numpy(frame_tensor).unsqueeze(0).float().to(self.dtype)
+        PERSON_LABEL = 0
+        # frame_tensor = image.transpose((2, 0, 1)) / 255
+        # frame_tensor = torch.from_numpy(frame_tensor).unsqueeze(0).float().to(self.dtype)
         
         with torch.no_grad():
-            preds = self.detection_model(frame_tensor)
+            preds = self.detection_model(image)
             
         persons_boxes = []
         probs = []
-        for box, label, score in zip(preds[0]['boxes'][:], preds[0]['labels'], preds[0]['scores']):
+        # print(preds[0].boxes)
+        for box, label, score in zip(preds[0].boxes.xyxy, preds[0].boxes.cls, preds[0].boxes.conf):
             if label == PERSON_LABEL and score > person_min_score:    
                 persons_boxes.append(box.detach().cpu().numpy())
                 probs.append(score.detach().cpu().numpy())
@@ -44,7 +49,7 @@ class PersonDetector():
         mask_bottom_court = cv2.warpPerspective(self.ref_bottom_court, matrix, image.shape[1::-1])
         person_bboxes_top, person_bboxes_bottom = [], []
 
-        bboxes, probs = self.detect(image, person_min_score=0.85)
+        bboxes, probs = self.detect(image, person_min_score=0.5)
         if len(bboxes) > 0:
             person_points = [[int((bbox[2] + bbox[0]) / 2), int(bbox[3])] for bbox in bboxes]
             person_bboxes = list(zip(bboxes, person_points))
