@@ -22,7 +22,7 @@ class CourtDetectorNet():
         kps_res = []
         matrixes_res = []
         for num in tqdm(range(2, len(frames), 3)):
-            # img = frames[num]
+            img = frames[num]
             img_prev = frames[num-1]
             img_preprev = frames[num-2]
             imgs = torch.cat((img_preprev, img_prev, img))
