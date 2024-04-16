@@ -61,7 +61,7 @@ def main(frames, scenes, bounces, ball_track, homography_matrices, kps_court, pe
         if (scene_rate > 0.5):
             court_img = get_court_img()
 
-            for i in range(scenes[num_scene][0], scenes[num_scene][1]):
+            for i in range(scenes[num_scene][0], min(scenes[num_scene][1]), len(ball_track)):
                 img_res = frames[i]
                 inv_mat = homography_matrices[i]
 
