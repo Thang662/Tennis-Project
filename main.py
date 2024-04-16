@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     print('court detection')
     court_detector = CourtDetectorNet(args.path_court_model, device)
-    homography_matrices, kps_court = court_detector.infer_model(frames_tmp, frames)
+    homography_matrices, kps_court = court_detector.infer_model(frames_tmp)
 
     print('person detection')
     person_detector = PersonDetector(device)

@@ -14,7 +14,7 @@ class CourtDetectorNet():
             self.model = LitTrackNetV2.load_from_checkpoint(path_model, frame_in = 9, frame_out = 45)
             self.model.eval()
             
-    def infer_model(self, frames, images):
+    def infer_model(self, frames):
         output_width = 640
         output_height = 360
         scale = 3
@@ -27,11 +27,6 @@ class CourtDetectorNet():
             img_preprev = frames[num-2]
             imgs = torch.cat((img_preprev, img_prev, img))
             inp = torch.unsqueeze(imgs, 0)
-
-            image = images[num]
-            image_prev = images[num-1]
-            image_preprev = images[num-2]
-            image_list = [image_preprev, image_prev, image]
 
             out = self.model(inp.to(self.device))
             pred = F.sigmoid(out).detach().cpu().numpy()
@@ -55,7 +50,7 @@ class CourtDetectorNet():
                     matrix_trans = cv2.invert(matrix_trans)[1]
                 kps_res.append(points)
                 matrixes_res.append(matrix_trans)
-            
+        print(num)
         return matrixes_res, kps_res    
 
     def _detect_blob_concomp(self, hm, _score_threshold = 0.5, _use_hm_weight = False, scale = 1080/288):
