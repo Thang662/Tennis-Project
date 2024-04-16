@@ -31,7 +31,7 @@ class CourtDetectorNet():
             image = images[num]
             image_prev = images[num-1]
             image_preprev = images[num-2]
-            image_list = np.concatenate((image_preprev, image_prev, image), axis=2)
+            image_list = [image_preprev, image_prev, image]
 
             out = self.model(inp.to(self.device))
             pred = F.sigmoid(out).detach().cpu().numpy()
