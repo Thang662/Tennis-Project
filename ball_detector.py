@@ -4,18 +4,18 @@ import cv2
 import numpy as np
 from scipy.spatial import distance
 from tqdm import tqdm
-from unet2d import TrackNetV2
+from model import TrackNetV2
 
 class BallDetector:
     def __init__(self, path_model=None, device='cuda'):
         self.model = TrackNetV2(n_channels = 9, n_classes = 3)
         self.device = device
         if path_model:
-            self.model.load_state_dict(torch.load(path_model, map_location=device)['model_state_dict'])
+            self.model.load_state_dict(torch.load(path_model, map_location=device)['state_dict'], strict = True)
             self.model = self.model.to(device)
             self.model.eval()
         self.width = 640
-        self.height = 360
+        self.height = 288
 
     def infer_model(self, frames):
         """ Run pretrained model on a consecutive list of frames
@@ -26,6 +26,7 @@ class BallDetector:
         """
         ball_track = [(None, None)]*2
         prev_pred = [None, None]
+        scale = frames[0].shape[0] / self.height
         for num in tqdm(range(2, len(frames), 3)):
             img = frames[num]
             img_prev = frames[num-1]
@@ -72,7 +73,7 @@ class BallDetector:
                 y = circles[0][0][1]*scale
         return x, y
     
-    def _detect_blob_concomp(self, hm, _score_threshold = 0.5, _use_hm_weight = False):
+    def _detect_blob_concomp(self, hm, _score_threshold = 0.5, _use_hm_weight = False, scale = 1080/288):
         x, y = None, None
         if np.max(hm) > _score_threshold:
             best_score = -1
@@ -95,4 +96,5 @@ class BallDetector:
                 if score > best_score:
                     best_score = score
                     x, y = x_temp, y_temp
+            return x, y
         return x, y

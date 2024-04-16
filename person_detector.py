@@ -12,8 +12,8 @@ class PersonDetector():
     def __init__(self, dtype=torch.FloatTensor):
         # self.detection_model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
         self.detection_model = YOLO("yolov8n.pt")
-        self.detection_model.export(format='engine')
-        self.detection_model = YOLO("yolov8n.engine")
+        # self.detection_model.export(format='engine')
+        # self.detection_model = YOLO("yolov8n.engine")
         self.detection_model = self.detection_model.to(dtype)
         # self.detection_model.eval()
         self.dtype = dtype
