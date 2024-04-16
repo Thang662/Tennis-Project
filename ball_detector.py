@@ -96,5 +96,5 @@ class BallDetector:
                 if score > best_score:
                     best_score = score
                     x, y = x_temp, y_temp
-            return x, y
+            return x * scale, y * scale
         return x, y
