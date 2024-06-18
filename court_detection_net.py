@@ -26,7 +26,7 @@ class CourtDetectorNet():
             img_prev = frames[num-1]
             img_preprev = frames[num-2]
             image_list = [img_preprev, img_prev, img]
-            imgs = torch.cat([transform(img)['image'] for img in image_list])
+            imgs = torch.cat([transform(image = img)['image'] for img in image_list])
             
             inp = torch.unsqueeze(imgs, 0)
 
