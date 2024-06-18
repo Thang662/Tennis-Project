@@ -10,8 +10,9 @@ def line_intersection(line1, line2):
     l2 = Line((line2[0], line2[1]), (line2[2], line2[3]))
 
     intersection = l1.intersection(l2)
-    if len(intersection) > 0 and isinstance(intersection[0], Line2D):
-        intersection = intersection[0].points
+    if len(intersection) > 0:
+        if isinstance(intersection[0], Line2D):
+            intersection = intersection[0].points
     point = intersection[0].coordinates if len(intersection) > 0 else None
     return point 
 
