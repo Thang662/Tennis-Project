@@ -98,7 +98,7 @@ def main(frames, scenes, bounces, ball_track, homography_matrices, kps_court, pe
                 if i in bounces and inv_mat is not None:
                     ball_point = ball_track[i]
                     img_res = cv2.circle(img_res, (int(ball_point[0]), int(ball_point[1])),
-                                        radius=0, color=(255, 0, 0), thickness=5)
+                                        radius=0, color=(255, 0, 0), thickness=10)
                     ball_point = np.array(ball_point, dtype=np.float32).reshape(1, 1, 2)
                     ball_point = cv2.perspectiveTransform(ball_point, inv_mat)
                     court_img = cv2.circle(court_img, (int(ball_point[0, 0, 0]), int(ball_point[0, 0, 1])),
