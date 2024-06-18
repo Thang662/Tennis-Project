@@ -13,7 +13,7 @@ class BallDetector:
         if path_model:
             # self.model = LitTrackNetV2.load_from_checkpoint(path_model, frame_in = 9, frame_out = 3)
             self.model = TrackNetV2(n_channels=9, n_classes=3)
-            self.model.load_state_dict(torch.load(path_model, map_location=device)['state_dict'], strict = True)
+            self.model.load_state_dict(torch.load(path_model, map_location=device)['model_state_dict'], strict = True)
             self.model = self.model.to(device)
             self.model.eval()
         self.width = 640
