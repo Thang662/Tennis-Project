@@ -5,14 +5,15 @@ import numpy as np
 from scipy.spatial import distance
 from tqdm import tqdm
 from model_lightning import LitTrackNetV2
+from unet2d import TrackNetV2
 
 class BallDetector:
     def __init__(self, path_model=None, device='cuda'):
         self.device = device
         if path_model:
-            self.model = LitTrackNetV2.load_from_checkpoint(path_model, frame_in = 9, frame_out = 3)
-            # self.model.load_state_dict(torch.load(path_model, map_location=device)['state_dict'], strict = True)
-            # self.model = self.model.to(device)
+            # self.model = LitTrackNetV2.load_from_checkpoint(path_model, frame_in = 9, frame_out = 3)
+            self.model.load_state_dict(torch.load(path_model, map_location=device)['state_dict'], strict = True)
+            self.model = self.model.to(device)
             self.model.eval()
         self.width = 640
         self.height = 288
