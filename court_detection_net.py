@@ -3,15 +3,22 @@ import numpy as np
 import torch
 from model_lightning import LitTrackNetV2
 import torch.nn.functional as F
+from tracknet import BallTrackerNet
 from tqdm import tqdm
 from postprocess import refine_kps
 from homography import get_trans_matrix, refer_kps
 
 class CourtDetectorNet():
     def __init__(self, path_model=None,  device='cuda'):
+        # self.device = device
+        # if path_model:
+        #     self.model = LitTrackNetV2.load_from_checkpoint(path_model, frame_in = 9, frame_out = 45)
+        #     self.model.eval()
+        self.model = BallTrackerNet(out_channels=15)
         self.device = device
         if path_model:
-            self.model = LitTrackNetV2.load_from_checkpoint(path_model, frame_in = 9, frame_out = 45)
+            self.model.load_state_dict(torch.load(path_model, map_location=device))
+            self.model = self.model.to(device)
             self.model.eval()
             
     def infer_model(self, frames, transform):
