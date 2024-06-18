@@ -1,3 +1,4 @@
+import os
 import cv2
 from court_detection_net import CourtDetectorNet
 import numpy as np
@@ -97,6 +98,8 @@ def main(frames, scenes, bounces, ball_track, homography_matrices, kps_court, pe
                 if i in bounces and inv_mat is not None:
                     ball_point = ball_track[i]
                     ball_point = np.array(ball_point, dtype=np.float32).reshape(1, 1, 2)
+                    img_res = cv2.circle(img_res, (int(ball_point[0]), int(ball_point[1])),
+                                        radius=0, color=(255, 0, 0), thickness=50)
                     ball_point = cv2.perspectiveTransform(ball_point, inv_mat)
                     court_img = cv2.circle(court_img, (int(ball_point[0, 0, 0]), int(ball_point[0, 0, 1])),
                                                        radius=0, color=(0, 255, 255), thickness=50)
@@ -117,6 +120,11 @@ def main(frames, scenes, bounces, ball_track, homography_matrices, kps_court, pe
                         person_point = cv2.perspectiveTransform(person_point, inv_mat)
                         minimap = cv2.circle(minimap, (int(person_point[0, 0, 0]), int(person_point[0, 0, 1])),
                                                            radius=0, color=(255, 0, 0), thickness=80)
+                
+                if i in bounces and inv_mat is not None:
+                    os.makedirs('bounces/', exist_ok=True)
+                    cv2.imwrite(f'bounces/bounces_{i}.jpg', img_res)
+                    cv2.imwrite(f'bounces/minimap_{i}.jpg', minimap)
 
                 minimap = cv2.resize(minimap, (width_minimap, height_minimap))
                 img_res[30:(30 + height_minimap), (width - 30 - width_minimap):(width - 30), :] = minimap
