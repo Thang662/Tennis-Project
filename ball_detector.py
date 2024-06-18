@@ -17,7 +17,7 @@ class BallDetector:
         self.width = 640
         self.height = 288
 
-    def infer_model(self, frames):
+    def infer_model(self, frames, transform):
         """ Run pretrained model on a consecutive list of frames
         :params
             frames: list of consecutive video frames
@@ -30,7 +30,8 @@ class BallDetector:
             img = frames[num]
             img_prev = frames[num-1]
             img_preprev = frames[num-2]
-            imgs = torch.cat((img_preprev, img_prev, img))
+            image_list = [img_preprev, img_prev, img]
+            imgs = torch.cat([transform(img)['image'] for img in image_list])
             inp = torch.unsqueeze(imgs, 0)
 
             out = self.model(inp.to(self.device))

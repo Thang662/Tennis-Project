@@ -154,15 +154,14 @@ if __name__ == '__main__':
                         ToTensorV2()
                     ],
                 )
-    frames_tmp = [transform(image = frame)['image'] for frame in frames]
 
     print('ball detection')
     ball_detector = BallDetector(args.path_ball_track_model, device)
-    ball_track = ball_detector.infer_model(frames_tmp)
+    ball_track = ball_detector.infer_model(frames, transform)
 
     print('court detection')
     court_detector = CourtDetectorNet(args.path_court_model, device)
-    homography_matrices, kps_court = court_detector.infer_model(frames_tmp)
+    homography_matrices, kps_court = court_detector.infer_model(frames, transform)
 
     print('person detection')
     person_detector = PersonDetector(device)
