@@ -63,8 +63,8 @@ class CourtDetectorNet():
                             matrix_trans = cv2.invert(matrix_trans)[1]
                         kps_res.append(points)
                         matrixes_res.append(matrix_trans)
-            kps_res = kps_res *  num // 3
-            matrixes_res = matrixes_res * num // 3
+            kps_res = kps_res *  (num // 3)
+            matrixes_res = matrixes_res * (num // 3)
 
         else:
             for num_frame, image in enumerate(tqdm(frames)):
