@@ -65,6 +65,7 @@ class CourtDetectorNet():
                         matrixes_res.append(matrix_trans)
             kps_res = kps_res *  (num // 3)
             matrixes_res = matrixes_res * (num // 3)
+            print(len(kps_res), len(matrixes_res))
 
         else:
             for num_frame, image in enumerate(tqdm(frames)):
