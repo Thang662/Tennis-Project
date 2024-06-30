@@ -32,7 +32,7 @@ class CourtDetectorNet():
         matrixes_res = []
         if isinstance(self.model, LitTrackNetV2):
             for num in tqdm(range(2, len(frames), 3)):
-                if i < 3:
+                if num < 3:
                     img = frames[num]
                     img_prev = frames[num-1]
                     img_preprev = frames[num-2]
